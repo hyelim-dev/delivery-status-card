@@ -68,15 +68,6 @@ const DashboardIntro = styled.section`
   }
 `;
 
-const Eyebrow = styled.p`
-  margin: 0;
-  color: #1264d8;
-  font-size: 0.75rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-`;
-
 const SummaryGrid = styled.section`
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -500,12 +491,8 @@ export function DeliveryDashboard() {
     <DashboardShell>
       <DashboardIntro>
         <div>
-          <Eyebrow>Logistics Operations</Eyebrow>
           <h1>배송 현황 모니터링</h1>
-          <p>
-            예외 상태를 먼저 발견하고, 운송장번호로 배송 건을 빠르게 검색할 수
-            있는 내부 운영용 카드 목록입니다.
-          </p>
+          <p>배송 상태별 카드 목록과 운송장번호 검색을 제공합니다.</p>
         </div>
       </DashboardIntro>
 
