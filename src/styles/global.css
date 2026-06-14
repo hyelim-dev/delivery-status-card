@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap");
+
+:root {
+  font-family:
+    "Noto Sans KR",
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  color: #142033;
+  background: #eef3f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --page-bg: #eef3f8;
+  --line: #dde4ee;
+  --line-strong: #cbd5e1;
+  --text: #142033;
+  --text-muted: #64748b;
+  --text-soft: #8896aa;
+  --shadow-card: 0 16px 42px rgba(20, 32, 51, 0.08);
+  --shadow-hover: 0 22px 52px rgba(20, 32, 51, 0.13);
+  --radius-card: 8px;
+
+  --status-ready: #64748b;
+  --status-ready-bg: #f8fafc;
+  --status-ready-line: #d6dde7;
+  --status-transit: #2563eb;
+  --status-transit-bg: #eff6ff;
+  --status-transit-line: #bfdbfe;
+  --status-delivered: #16a34a;
+  --status-delivered-bg: #ecfdf3;
+  --status-delivered-line: #bbf7d0;
+  --status-delayed: #f59e0b;
+  --status-delayed-bg: #fffbeb;
+  --status-delayed-line: #f59e0b;
+  --status-returned: #e11d48;
+  --status-returned-bg: #fff1f2;
+  --status-returned-line: #e11d48;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(239, 246, 255, 0.72),
+      rgba(238, 243, 248, 0.92)
+    ),
+    var(--page-bg);
+}
+
+button,
+input {
+  font: inherit;
+}
