@@ -62,7 +62,7 @@ export const DELIVERY_STATUS_CONFIG: Record<
     shortLabel: "반송",
     icon: RotateCcw,
     toneClass: "status-returned",
-    description: "배송이 중단되어 반송 절차가 진행 중입니다.",
+    description: "반송 절차가 진행 중입니다.",
   },
 };
 
@@ -108,6 +108,12 @@ export const STEP_LABELS = {
   PICKED_UP: "집화",
   MOVING: "이동 중",
   DELIVERED: "배송 완료",
+} as const;
+
+export const RETURN_STEP_LABELS = {
+  RETURN_REQUESTED: "반송 접수",
+  RETURN_PICKING: "회수 중",
+  RETURN_COMPLETED: "반송 완료",
 } as const;
 
 export const SummaryIcon = PackageCheck;

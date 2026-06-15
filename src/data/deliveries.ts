@@ -1,4 +1,4 @@
-import { STEP_LABELS } from "@/constants/deliveryStatus";
+import { RETURN_STEP_LABELS, STEP_LABELS } from "@/constants/deliveryStatus";
 import {
   Delivery,
   DeliveryStep,
@@ -15,6 +15,12 @@ const stepOrder: DeliveryStepKey[] = [
   "DELIVERED",
 ];
 
+const returnStepOrder: DeliveryStepKey[] = [
+  "RETURN_REQUESTED",
+  "RETURN_PICKING",
+  "RETURN_COMPLETED",
+];
+
 const statusValues: DeliveryStatus[] = [
   "READY",
   "IN_TRANSIT",
@@ -28,7 +34,7 @@ const statusCurrentStep: Record<DeliveryStatus, DeliveryStepKey> = {
   IN_TRANSIT: "MOVING",
   DELIVERED: "DELIVERED",
   DELAYED: "MOVING",
-  RETURNED: "PICKED_UP",
+  RETURNED: "RETURN_PICKING",
 };
 
 const recipients = [
@@ -103,9 +109,10 @@ const makeSteps = (
   current: DeliveryStepKey,
   status: DeliveryStatus,
 ): DeliveryStep[] => {
-  const currentIndex = stepOrder.indexOf(current);
+  const currentStepOrder = status === "RETURNED" ? returnStepOrder : stepOrder;
+  const currentIndex = currentStepOrder.indexOf(current);
 
-  return stepOrder.map((key, index) => {
+  return currentStepOrder.map((key, index) => {
     let state: DeliveryStep["state"] = "pending";
 
     if ((status === "RETURNED" || status === "DELAYED") && key === current) {
@@ -118,7 +125,10 @@ const makeSteps = (
 
     return {
       key,
-      label: STEP_LABELS[key],
+      label:
+        status === "RETURNED"
+          ? RETURN_STEP_LABELS[key as keyof typeof RETURN_STEP_LABELS]
+          : STEP_LABELS[key as keyof typeof STEP_LABELS],
       state,
     };
   });
@@ -199,6 +209,84 @@ const makeHistory = (
   return commonHistory;
 };
 
+const makeEdgeHistory = (
+  edgeId: string,
+  location: string,
+): Delivery["history"] => [
+  {
+    id: `${edgeId}-H1`,
+    time: "2026-06-12 09:10",
+    location,
+    description: "배송 주문이 접수되어 출고 준비 목록에 등록되었습니다.",
+  },
+  {
+    id: `${edgeId}-H2`,
+    time: "2026-06-12 10:25",
+    location,
+    description: "배송 단계가 업데이트되었습니다.",
+  },
+];
+
+const createEdgeDelivery = (
+  index: number,
+  overrides: Partial<Delivery>,
+): Delivery => {
+  const status = overrides.status ?? "IN_TRANSIT";
+  const currentStep = statusCurrentStep[status];
+  const edgeId = `EDGE-${String(index).padStart(6, "0")}`;
+  const origin = "서울 강서 허브";
+  const destination = "서울특별시 마포구 월드컵북로 396 프리미엄스퀘어 14층";
+  const currentLocation = "서울 강서 허브 간선 이동 구간";
+
+  return {
+    id: edgeId,
+    invoiceNo: `KR-EDGE-${String(index).padStart(6, "0")}`,
+    senderName: "오엠니크 물류",
+    senderPhone: "010-4102-8831",
+    recipient: "예외케이스",
+    recipientPhone: "010-1000-2000",
+    origin,
+    destination,
+    estimatedArrival: "2026-06-15",
+    status,
+    currentLocation,
+    lastUpdatedAt: "2026-06-12 13:40",
+    driverName: "최지훈",
+    driverPhone: "010-2381-9044",
+    memo: "주소 확인 완료",
+    steps: makeSteps(currentStep, status),
+    history: makeEdgeHistory(edgeId, currentLocation),
+    ...overrides,
+  };
+};
+
+const edgeDeliveries: Delivery[] = [
+  createEdgeDelivery(1, {
+    status: "READY",
+    steps: makeSteps(statusCurrentStep.READY, "READY"),
+    recipient: "빈값누락데이터",
+    senderName: "",
+    senderPhone: "",
+    currentLocation: "",
+    estimatedArrival: "",
+    driverName: "",
+    driverPhone: "",
+    history: [],
+    lastUpdatedAt: "",
+    memo: "",
+  }),
+  createEdgeDelivery(2, {
+    recipient: "긴수령인이름예외처리테스트용수령인입니다",
+  }),
+  createEdgeDelivery(3, {
+    recipient: "주소2줄이상예외처리",
+    origin:
+      "서울특별시 강남구 테헤란로 521 파르나스타워 장기보관실 앞 출입구 오른쪽 무인택배함 3번 구역",
+    destination:
+      "부산광역시 해운대구 센텀중앙로 97 물류동 지하 2층 장기보관실 맞은편 고객전용 무인택배함",
+  }),
+];
+
 const generateMockDeliveries = (count: number): Delivery[] => {
   const shuffledStatuses = makeStatusSequence(count);
 
@@ -238,4 +326,7 @@ const generateMockDeliveries = (count: number): Delivery[] => {
   });
 };
 
-export const deliveries = generateMockDeliveries(MOCK_DELIVERY_COUNT);
+export const deliveries = [
+  ...edgeDeliveries,
+  ...generateMockDeliveries(MOCK_DELIVERY_COUNT - edgeDeliveries.length),
+];

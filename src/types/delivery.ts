@@ -1,15 +1,26 @@
 export type DeliveryStatus =
-  | 'READY'
-  | 'IN_TRANSIT'
-  | 'DELIVERED'
-  | 'DELAYED'
-  | 'RETURNED';
+  | "READY"
+  | "IN_TRANSIT"
+  | "DELIVERED"
+  | "DELAYED"
+  | "RETURNED";
 
-export type DeliveryFilterStatus = DeliveryStatus | 'ALL';
+export type DeliveryFilterStatus = DeliveryStatus | "ALL";
 
-export type DeliveryStepKey = 'READY' | 'PICKED_UP' | 'MOVING' | 'DELIVERED';
+export type DeliveryStepKey =
+  | "READY"
+  | "PICKED_UP"
+  | "MOVING"
+  | "DELIVERED"
+  | "RETURN_REQUESTED"
+  | "RETURN_PICKING"
+  | "RETURN_COMPLETED";
 
-export type DeliveryStepState = 'completed' | 'current' | 'pending' | 'exception';
+export type DeliveryStepState =
+  | "completed"
+  | "current"
+  | "pending"
+  | "exception";
 
 export interface DeliveryStep {
   key: DeliveryStepKey;
@@ -27,19 +38,19 @@ export interface DeliveryHistory {
 export interface Delivery {
   id: string;
   invoiceNo: string;
-  senderName: string;
-  senderPhone: string;
+  senderName?: string | null;
+  senderPhone?: string | null;
   recipient: string;
-  recipientPhone: string;
-  origin: string;
-  destination: string;
-  estimatedArrival: string;
+  recipientPhone?: string | null;
+  origin?: string | null;
+  destination?: string | null;
+  estimatedArrival?: string | null;
   status: DeliveryStatus;
-  currentLocation: string;
-  lastUpdatedAt: string;
-  driverName: string;
-  driverPhone: string;
-  memo: string;
+  currentLocation?: string | null;
+  lastUpdatedAt?: string | null;
+  driverName?: string | null;
+  driverPhone?: string | null;
+  memo?: string | null;
   steps: DeliveryStep[];
-  history: DeliveryHistory[];
+  history?: DeliveryHistory[] | null;
 }

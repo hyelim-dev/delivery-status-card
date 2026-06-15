@@ -4,6 +4,12 @@ import styled, { css } from "styled-components";
 import { DELIVERY_STATUS_CONFIG } from "@/constants/deliveryStatus";
 import { getStatusTone } from "@/styles/theme";
 import { Delivery } from "@/types/delivery";
+import {
+  displayMemo,
+  displayValue,
+  EMPTY_HISTORY_TEXT,
+  isEmptyValue,
+} from "@/utils/displayValue";
 
 const ModalBackdrop = styled.div`
   position: fixed;
@@ -101,16 +107,21 @@ const IconButton = styled.button`
 
 const ModalStatusRow = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   padding: 18px 22px;
   border-bottom: 1px solid var(--line);
   color: var(--text-muted);
   font-size: 0.92rem;
-  font-weight: 700;
+  font-weight: 500;
+
+  > span:last-child {
+    line-height: 1.35;
+  }
 
   @media (max-width: 720px) {
     flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
     padding: 14px 16px;
   }
@@ -142,7 +153,7 @@ const ModalInfoGrid = styled.div`
     margin: 5px 0 0;
     color: var(--text);
     font-size: 0.92rem;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
@@ -222,7 +233,7 @@ const ContactInfoGrid = styled.div`
     margin: 5px 0 0;
     color: var(--text);
     font-size: 0.9rem;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
@@ -296,6 +307,14 @@ const HistoryList = styled.ol`
       font-size: 0.82rem;
     }
   }
+`;
+
+const EmptyStateText = styled.p`
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.5;
 `;
 
 const MemoText = styled.p<{ $empty: boolean }>`
@@ -375,7 +394,8 @@ export function DeliveryDetailModal({
 
   const statusConfig = DELIVERY_STATUS_CONFIG[delivery.status];
   const StatusIcon = statusConfig.icon;
-  const displayMemo = delivery.memo.trim() || "등록된 메모가 없습니다.";
+  const memoText = displayMemo(delivery.memo);
+  const hasHistory = Boolean(delivery.history?.length);
 
   return (
     <ModalBackdrop onMouseDown={onClose}>
@@ -415,35 +435,35 @@ export function DeliveryDetailModal({
           <ModalInfoGrid>
             <div>
               <DetailLabel>보낸 사람</DetailLabel>
-              <p>{delivery.senderName}</p>
+              <p>{displayValue(delivery.senderName)}</p>
             </div>
             <div>
               <DetailLabel>보낸 사람 연락처</DetailLabel>
-              <p>{delivery.senderPhone}</p>
+              <p>{displayValue(delivery.senderPhone)}</p>
             </div>
             <div>
               <DetailLabel>수령인</DetailLabel>
-              <p>{delivery.recipient}</p>
+              <p>{displayValue(delivery.recipient)}</p>
             </div>
             <div>
               <DetailLabel>수령인 연락처</DetailLabel>
-              <p>{delivery.recipientPhone}</p>
+              <p>{displayValue(delivery.recipientPhone)}</p>
             </div>
             <div>
               <DetailLabel>출발지</DetailLabel>
-              <p>{delivery.origin}</p>
+              <p>{displayValue(delivery.origin)}</p>
             </div>
             <div>
               <DetailLabel>도착지</DetailLabel>
-              <p>{delivery.destination}</p>
+              <p>{displayValue(delivery.destination)}</p>
             </div>
             <div>
               <DetailLabel>현재 위치</DetailLabel>
-              <p>{delivery.currentLocation}</p>
+              <p>{displayValue(delivery.currentLocation)}</p>
             </div>
             <div>
               <DetailLabel>예상 도착일</DetailLabel>
-              <p>{delivery.estimatedArrival}</p>
+              <p>{displayValue(delivery.estimatedArrival)}</p>
             </div>
           </ModalInfoGrid>
         </ModalSection>
@@ -453,11 +473,11 @@ export function DeliveryDetailModal({
           <ContactInfoGrid>
             <div>
               <DetailLabel>배송 담당자</DetailLabel>
-              <p>{delivery.driverName}</p>
+              <p>{displayValue(delivery.driverName)}</p>
             </div>
             <div>
               <DetailLabel>담당자 연락처</DetailLabel>
-              <p>{delivery.driverPhone}</p>
+              <p>{displayValue(delivery.driverPhone)}</p>
             </div>
           </ContactInfoGrid>
         </ModalSection>
@@ -465,24 +485,28 @@ export function DeliveryDetailModal({
         <ModalSection>
           <SectionHeader>
             <h3>배송 이동 이력</h3>
-            <span>최근 업데이트 {delivery.lastUpdatedAt}</span>
+            <span>최근 업데이트 {displayValue(delivery.lastUpdatedAt)}</span>
           </SectionHeader>
-          <HistoryList>
-            {delivery.history.map((history) => (
-              <li key={history.id}>
-                <time>{history.time}</time>
-                <div>
-                  <strong>{history.location}</strong>
-                  <p>{history.description}</p>
-                </div>
-              </li>
-            ))}
-          </HistoryList>
+          {hasHistory ? (
+            <HistoryList>
+              {delivery.history?.map((history) => (
+                <li key={history.id}>
+                  <time>{displayValue(history.time)}</time>
+                  <div>
+                    <strong>{displayValue(history.location)}</strong>
+                    <p>{displayValue(history.description)}</p>
+                  </div>
+                </li>
+              ))}
+            </HistoryList>
+          ) : (
+            <EmptyStateText>{EMPTY_HISTORY_TEXT}</EmptyStateText>
+          )}
         </ModalSection>
 
         <ModalSection>
           <h3>메모</h3>
-          <MemoText $empty={!delivery.memo.trim()}>{displayMemo}</MemoText>
+          <MemoText $empty={isEmptyValue(delivery.memo)}>{memoText}</MemoText>
         </ModalSection>
       </ModalPanel>
     </ModalBackdrop>

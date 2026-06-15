@@ -11,6 +11,7 @@ import { DELIVERY_STATUS_CONFIG } from "@/constants/deliveryStatus";
 import { DeliveryTimeline } from "@/components/DeliveryTimeline";
 import { getStatusTone } from "@/styles/theme";
 import { Delivery } from "@/types/delivery";
+import { displayValue } from "@/utils/displayValue";
 
 interface DeliveryCardProps {
   delivery: Delivery;
@@ -131,14 +132,17 @@ const StatusBadge = styled.span`
 `;
 
 const RecipientRow = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 14px;
+  min-width: 0;
 `;
 
 const RecipientName = styled.span`
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  width: 100%;
   align-items: center;
   min-width: 0;
   gap: 8px;
@@ -146,12 +150,21 @@ const RecipientName = styled.span`
   font-size: 1.08rem;
   font-weight: 900;
   line-height: 1.35;
-  overflow-wrap: anywhere;
+  overflow: hidden;
 
   svg {
     flex: 0 0 auto;
     color: var(--card-accent);
   }
+`;
+
+const RecipientText = styled.span`
+  display: block;
+  min-width: 0;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const RouteSummary = styled.div`
@@ -182,11 +195,21 @@ const RouteLabel = styled.span`
 `;
 
 const RouteAddress = styled.span`
+  display: -webkit-box;
+  width: 100%;
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
   color: var(--text-muted);
   font-size: 0.88rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.45;
+  overflow: hidden;
   overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 `;
 
 const ArrivalRow = styled.div`
@@ -248,7 +271,7 @@ export function DeliveryCard({ delivery, onOpenDetail }: DeliveryCardProps) {
         <RecipientRow>
           <RecipientName>
             <UserRound size={17} />
-            {delivery.recipient}
+            <RecipientText>{delivery.recipient}</RecipientText>
           </RecipientName>
           <ChevronRight size={20} color="var(--text-soft)" aria-hidden="true" />
         </RecipientRow>
@@ -257,18 +280,18 @@ export function DeliveryCard({ delivery, onOpenDetail }: DeliveryCardProps) {
           <RoutePoint>
             <MapPin size={15} />
             <RouteLabel>출발지:</RouteLabel>
-            <RouteAddress>{delivery.origin}</RouteAddress>
+            <RouteAddress>{displayValue(delivery.origin)}</RouteAddress>
           </RoutePoint>
           <RoutePoint>
             <Route size={15} />
             <RouteLabel>도착지:</RouteLabel>
-            <RouteAddress>{delivery.destination}</RouteAddress>
+            <RouteAddress>{displayValue(delivery.destination)}</RouteAddress>
           </RoutePoint>
         </RouteSummary>
 
         <ArrivalRow>
           <span>예상 도착일</span>
-          <strong>{delivery.estimatedArrival}</strong>
+          <strong>{displayValue(delivery.estimatedArrival)}</strong>
         </ArrivalRow>
       </CardContent>
 

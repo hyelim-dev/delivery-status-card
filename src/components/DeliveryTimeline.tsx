@@ -8,10 +8,13 @@ interface DeliveryTimelineProps {
 }
 type TimelineState = DeliveryStep["state"];
 
-const TimelineRoot = styled.div`
+const TimelineRoot = styled.div<{ $stepCount: number }>`
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(
+    ${({ $stepCount }) => $stepCount},
+    minmax(0, 1fr)
+  );
   gap: 8px;
   padding: 0 20px 22px;
 
@@ -20,13 +23,18 @@ const TimelineRoot = styled.div`
   }
 `;
 
-const TimelineTrack = styled.div`
+const TimelineTrack = styled.div<{ $stepCount: number }>`
   position: absolute;
   top: 13px;
-  right: calc(12.5% + 20px);
-  left: calc(12.5% + 20px);
+  right: calc(${({ $stepCount }) => 100 / ($stepCount * 2)}% + 20px);
+  left: calc(${({ $stepCount }) => 100 / ($stepCount * 2)}% + 20px);
   height: 2px;
   background: var(--line);
+
+  @media (max-width: 720px) {
+    right: calc(${({ $stepCount }) => 100 / ($stepCount * 2)}% + 16px);
+    left: calc(${({ $stepCount }) => 100 / ($stepCount * 2)}% + 16px);
+  }
 `;
 
 const TimelineStep = styled.div<{ $state: TimelineState }>`
@@ -82,8 +90,12 @@ const TimelineLabel = styled.span`
 
 export function DeliveryTimeline({ steps, status }: DeliveryTimelineProps) {
   return (
-    <TimelineRoot role="group" aria-label="배송 진행 단계">
-      <TimelineTrack aria-hidden="true" />
+    <TimelineRoot
+      $stepCount={steps.length}
+      role="group"
+      aria-label="배송 진행 단계"
+    >
+      <TimelineTrack $stepCount={steps.length} aria-hidden="true" />
       {steps.map((step) => {
         const isException = step.state === "exception";
         const Icon = isException
