@@ -16,3 +16,4 @@ coverage/
 *.tsbuildinfo
 *.d.ts.map
 vite.config.d.ts
+vite.config.js
